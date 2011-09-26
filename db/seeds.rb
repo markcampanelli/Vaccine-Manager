@@ -5,3 +5,15 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+#  Vaccine.delete_all
+
+#  Vaccine.create([ 
+#{name: 'Hepatitis B', cdc_name: 'HepB'}, 
+#{name: 'Rotavirus', cdc_name: 'RV'}, 
+#{name: 'Diphtheria, Tetanus, Pertussis', cdc_name: 'DTaP'}, 
+#{name: 'Haemophilus influenzae type b', cdc_name: 'Hib'}, 
+#{name: 'Pneumococcal', cdc_name: 'PCV'}, 
+#{name: 'Influenza', cdc_name: 'Influenza'}, 
+#{name: 'Measles, Mumps, Rubella', cdc_name: 'MMR'}, 
+#{cdc_name: 'Hepatitis A', cdc_name: 'HepA'} ])
