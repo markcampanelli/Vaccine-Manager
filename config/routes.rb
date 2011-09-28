@@ -1,4 +1,6 @@
 VaccineManager::Application.routes.draw do
+  resources :schedules
+
   get "manager/timetable"
 
   # The priority is based upon order of creation:
