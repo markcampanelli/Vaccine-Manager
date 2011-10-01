@@ -15,7 +15,8 @@ ActiveRecord::Schema.define(:version => 20110928084845) do
 
   create_table "doses", :force => true do |t|
     t.integer  "vaccine_id"
-    t.date     "days_scheduled_from_date_of_birth"
+    t.integer  "months_scheduled_from_date_of_birth"
+    t.integer  "administration_window_in_months"
     t.date     "date_administered"
     t.text     "notes"
     t.datetime "created_at"

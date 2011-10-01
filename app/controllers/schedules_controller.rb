@@ -45,8 +45,8 @@ class SchedulesController < ApplicationController
   # POST /schedules
   # POST /schedules.json
   def create
-    @schedule= Schedule.new(params[:schedule].merge!(
-vaccines_attributes: Schedule::vaccine_attributes_for(params[:schedule][:template])))
+    @schedule= Schedule.new(params[:schedule])
+    @schedule.vaccines.build(@schedule.template_vaccines)
 
     respond_to do |format|
       if @schedule.save
