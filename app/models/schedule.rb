@@ -37,12 +37,29 @@ class Schedule < ActiveRecord::Base
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 6, administration_window_in_months: 1 },
 { months_scheduled_from_date_of_birth: 12, administration_window_in_months: 3 } ] }, 
-{position: 5, name: 'Pneumococcal conjugate vaccine, 13-valent', short_name: 'PCV13', start_admin_min_weeks: 6, start_admin_max_years: 5}, 
-{position: 6, name: 'Inactivated poliovirus vaccine', short_name: 'IPV', start_admin_min_weeks: 6}, 
-{position: 7, name: 'Trivalent inactivated influenza vaccine', short_name: 'TIV', start_admin_min_months: 6}, 
-{position: 8, name: 'Live, attenuated influenza vaccine', short_name: 'LAIV', start_admin_min_years: 2}, 
-{position: 9, name: 'Measles, Mumps, & Rubella', short_name: 'MMR', start_admin_min_years: 1}, 
-{position: 10, name: 'Hepatitis A', short_name: 'HepA', start_admin_min_years: 1} 
+{position: 5, name: 'Pneumococcal conjugate vaccine, 13-valent', short_name: 'PCV13', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
+{ months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
+{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 1 },
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 3 } ] }, 
+{position: 6, name: 'Inactivated poliovirus vaccine', short_name: 'IPV', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
+{ months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
+{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 12 },
+{ months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] },
+{position: 7, name: 'Trivalent inactivated influenza vaccine', short_name: 'TIV', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 12 } ] }, 
+{position: 8, name: 'Live, attenuated influenza vaccine', short_name: 'LAIV', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 2*12, administration_window_in_months: 12 } ] },
+{position: 9, name: 'Measles, Mumps, & Rubella', short_name: 'MMR', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 }, 
+{ months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] }, 
+{position: 10, name: 'Varicella', short_name: 'Varicella', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 }, 
+{ months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] }, 
+{position: 11, name: 'Hepatitis A', short_name: 'HepA', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 6 },
+{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 6 } ] }
 ]
         
       when Templates[1] # Custom
