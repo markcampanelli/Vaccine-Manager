@@ -1,6 +1,7 @@
 class Schedule < ActiveRecord::Base
   
   Templates= [ 'U.S. CDC 2011', 'Custom' ]
+  @default_template= Templates[0] # Holds template choice during create error
   
   has_many :vaccines, dependent: :destroy, order: :position
   has_many :doses, through: :vaccines
@@ -21,7 +22,7 @@ class Schedule < ActiveRecord::Base
 { position: 1, name: 'Hepatitis B', short_name: 'HepB', doses_attributes: [
 { months_scheduled_from_date_of_birth: 0, administration_window_in_months: 0 }, 
 { months_scheduled_from_date_of_birth: 1, administration_window_in_months: 2 }, 
-{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 12 } ] },
+{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 13 } ] },
 { position: 2, name: 'Rotavirus', short_name: 'RV', doses_attributes: [
 { months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
@@ -36,12 +37,12 @@ class Schedule < ActiveRecord::Base
 { months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 6, administration_window_in_months: 1 },
-{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 3 } ] }, 
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 } ] }, 
 {position: 5, name: 'Pneumococcal conjugate vaccine, 13-valent', short_name: 'PCV13', doses_attributes: [
 { months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 6, administration_window_in_months: 1 },
-{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 3 } ] }, 
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 } ] }, 
 {position: 6, name: 'Inactivated poliovirus vaccine', short_name: 'IPV', doses_attributes: [
 { months_scheduled_from_date_of_birth: 2, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
@@ -64,8 +65,7 @@ class Schedule < ActiveRecord::Base
 { months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] }, 
 {position: 11, name: 'Hepatitis A', short_name: 'HepA', doses_attributes: [
 { months_scheduled_from_date_of_birth: 12, administration_window_in_months: 6 },
-{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 6 } ] }
-]
+{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 6 } ] } ]
         
       when Templates[1] # Custom
         return []
@@ -74,6 +74,29 @@ class Schedule < ActiveRecord::Base
         puts "MESSAGE: Invalide template (" + template.to_s + ") detected."
         return []
     end
+  end
+  
+  def dose_months
+    doses= self.doses
+    dose_months= SortedSet.new()
+    
+    doses.each do |dose|
+      unless dose.administration_window_in_months < 1 # E.g., skip automatic Birth dose column
+        dose_months << dose.months_scheduled_from_date_of_birth
+        dose_months << (dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months - 1)
+      end
+    end
+    
+    dose_months.to_a
+    
+    doses.each do |dose|
+      if dose.administration_window_in_months == 0 # E.g., Birth dose column
+        dose_months << dose.months_scheduled_from_date_of_birth unless 
+dose_months.count(dose.months_scheduled_from_date_of_birth) == 2
+      end  
+    end
+    
+    return dose_months.sort
   end
   
 end

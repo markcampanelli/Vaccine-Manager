@@ -1,7 +1,7 @@
 class Vaccine < ActiveRecord::Base
 
   belongs_to :schedule
-  has_many :doses, dependent: :destroy
+  has_many :doses, dependent: :destroy, order: :months_scheduled_from_date_of_birth
   accepts_nested_attributes_for :doses
   
   attr_accessible :position, :name, :short_name, :notes, :doses_attributes

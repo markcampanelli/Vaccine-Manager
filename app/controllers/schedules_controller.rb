@@ -27,7 +27,7 @@ class SchedulesController < ApplicationController
   # GET /schedules/new
   # GET /schedules/new.json
   def new
-    @schedule = Schedule.new
+    @schedule= Schedule.new
     @subtitle= ": Entering New Schedule"
 
     respond_to do |format|
@@ -38,7 +38,7 @@ class SchedulesController < ApplicationController
 
   # GET /schedules/1/edit
   def edit
-    @schedule = Schedule.find(params[:id])
+    @schedule= Schedule.find(params[:id])
     @subtitle= ": Editing Schedule for " << @schedule.person_name
   end
 
@@ -47,12 +47,13 @@ class SchedulesController < ApplicationController
   def create
     @schedule= Schedule.new(params[:schedule])
     @schedule.vaccines.build(@schedule.template_vaccines)
-
+       
     respond_to do |format|
       if @schedule.save
         format.html { redirect_to @schedule, notice: 'Schedule was successfully created.' }
         format.json { render json: @schedule, status: :created, location: @schedule }
       else
+        @default_template= @schedule.template
         format.html { render action: "new" }
         format.json { render json: @schedule.errors, status: :unprocessable_entity }
       end

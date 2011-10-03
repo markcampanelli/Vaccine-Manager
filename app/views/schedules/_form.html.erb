@@ -21,7 +21,8 @@
   </div>
   <div class="field">
     <%= f.label :template, "Schedule template" %><br />
-    <%= f.select :template, options_for_select(Schedule::Templates.map {|template| [template, template] }) %>
+    <%= f.select :template, 
+options_for_select(Schedule::Templates.map {|template| [template, template] }, @default_template) %>
   </div>
   <div class="field">
     <%= f.label :notes %><br />

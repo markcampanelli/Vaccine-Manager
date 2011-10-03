@@ -3,25 +3,26 @@
 <p>
   <b><%= @schedule.template %></b> schedule for <b><%= @schedule.person_name %></b> born on <b><%= @schedule.date_of_birth %></b>
 </p>
-
 <p>
-  <% unless @schedule.vaccines.blank? %>
   <table>
     <tr>
       <th>Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
+      <% @schedule.dose_months.each do |month| %>
+        <th><%= month %>&nbsp;M</th>
+      <% end %>
     </tr>
     <% @schedule.vaccines.each do |vaccine| %>
     <tr>
-      <td><%= vaccine.name %></td>
-      <% vaccine.doses.each do |dose| %>
-        <td><%= dose_info(dose) %></td>
+      <td><b><%= vaccine.name %></b></td>
+      <% @schedule.dose_months.each do |month| %>
+        <%= dose_info(vaccine, month) %>
       <% end %>
     </tr>
     <% end %>
+    <tr>
+      <td>Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>"><%= @schedule.notes %></td>
+    </tr>
   </table>
-  <% else %>
-    <b>Empty Schedule</b>
-  <% end %>
 </p>
 
 <%= link_to 'Edit', edit_schedule_path(@schedule) %> |
