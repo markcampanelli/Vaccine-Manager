@@ -7,7 +7,7 @@ class Dose < ActiveRecord::Base
   validates :months_scheduled_from_date_of_birth, presence: true, 
 :numericality => { only_integer: { greater_than_or_equal_to: 0 } }
   validates :administration_window_in_months, presence: true, 
-:numericality => { only_integer: { greater_than_or_equal_to: 0 } }
+:numericality => { only_integer: { greater_than_or_equal_to: 1 } }
 #  WIP: Validate that :date_administered is >= the DOB in schedule. (What about DOB changes?)
 
 

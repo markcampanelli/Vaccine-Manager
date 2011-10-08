@@ -1,3 +1,51 @@
 // Place all the styles related to the Schedules controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+  
+  table {
+    table-layout: auto;
+    border-collapse: collapse;
+    tr th, td {
+      border-width: thin;
+    }
+  }
+  
+  .list_line_even {
+    background: #ffffcc;
+  }
+  
+  .list_line_odd {
+    background: #ffcc99;
+  }
+
+  .table_header {
+    border-style: dashed;
+    text-align: center;
+  }
+  
+  .dose_short_name {
+    border-style: dashed dashed none;
+    padding: 0.25em 0.5em 0em;
+    white-space: nowrap;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .dose_due {
+    border-style: none dashed none;
+    padding: 0em 0.5em 0em;
+    white-space: nowrap;
+    text-align: left;
+  }
+  
+  .dose_given {
+    border-style: none dashed dashed;
+    padding: 0em 0.5em 0.25em;
+    white-space: nowrap;
+    text-align: left;
+  }
+  
+  .notes {
+    border-style: dashed;
+  }

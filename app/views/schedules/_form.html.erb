@@ -1,4 +1,4 @@
-<%= form_for(@schedule) do |f| %>
+<%= form_for(@schedule) do |schedule_form| %>
   <% if @schedule.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@schedule.errors.count, "error") %> prohibited this schedule from being saved:</h2>
@@ -10,25 +10,54 @@
       </ul>
     </div>
   <% end %>
-
   <div class="field">
-    <%= f.label :person_name, "Person's name" %><br />
-    <%= f.text_field :person_name, size: 60 %>
+    <%= schedule_form.select(:template, options_for_select(Schedule::Templates, selected: Schedule::Templates[0], 
+disabled: Schedule::Templates[1..Schedule::Templates.length-1] )) %> 0&ndash;6 year immunization schedule for 
+<%= schedule_form.text_field :person_name, size: 40, placeholder: "Enter person name"  %> born on 
+<%= select_day @schedule.date_of_birth.nil? ? Date.today.day : @schedule.date_of_birth.day, :prefix => :date_of_birth %><%= select_month @schedule.date_of_birth.nil? ? Date.today.month : @schedule.date_of_birth.month, :prefix => :date_of_birth %><%= text_field_tag "date_of_birth[year]", @schedule.date_of_birth.nil? ? Date.today.year : @schedule.date_of_birth.year, placeholder: "Year (YYYY)", size: 10 %>
   </div>
   <div class="field">
-    <%= f.label :date_of_birth, "Birthday" %><br />
-    <%= f.date_select :date_of_birth %>
-  </div>
-  <div class="field">
-    <%= f.label :template, "Schedule template" %><br />
-    <%= f.select :template, 
-options_for_select(Schedule::Templates.map {|template| [template, template] }, @default_template) %>
-  </div>
-  <div class="field">
-    <%= f.label :notes %><br />
-    <%= f.text_area :notes %>
+    <table>
+      <% unless @schedule.new_record? %>
+        <tr>
+          <th>Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
+          <% @schedule.dose_months.each do |month| %>
+            <th><%= month %>&nbsp;M</th>
+          <% end %>
+        </tr>
+        <% @schedule.vaccines.each do |vaccine| %>
+          <tr>
+            <th><%= vaccine.name %></th>
+            <% @schedule.dose_months.each do |month| %>
+              <%= schedule_form.fields_for :vaccines, vaccine do |vaccine_fields| %>
+                <% flag= false; vaccine.doses.each do |dose| %>
+                  <% if dose.months_scheduled_from_date_of_birth == month %>
+                    <td colspan="<%= dose_colspan(dose, month) %>", style="white-space: nowrap">
+                      <%= vaccine.short_name %><br />
+                      due:&nbsp;<%= ((dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth)).to_s + (dose.administration_window_in_months > 0 ? "&ndash;" + (dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1)).to_s  : "" )).html_safe %><br />
+                      given:&nbsp;<%= vaccine_fields.fields_for :doses, dose do |dose_fields| %>
+<%= dose_fields.date_select :date_administered, use_short_month: true, start_year: @schedule.date_of_birth.year, end_year: @schedule.date_of_birth.year + 8, order: [ :day, :month, :year ], prompt: { day: '-d-', month: '-m-', year: '-y-' } %></td>
+                      <% end %>
+                    <% flag= true; break %>
+                  <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + 
+        dose.administration_window_in_months) %>
+                    <% flag= true; break %>
+                  <% end %>
+                <% end %>
+                <% unless flag %>
+                  <td>&nbsp;</td>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+      <tr>
+        <td>Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>"><%= schedule_form.text_area :notes, cols: 80, rows: 5, placeholder: "Enter optional notes" %></td>
+      </tr>
+    </table>
   </div>
   <div class="actions">
-    <%= f.submit %>
+    <%= schedule_form.submit %>
   </div>
 <% end %>

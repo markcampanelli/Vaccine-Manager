@@ -1,29 +1,81 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b><%= @schedule.template %></b> schedule for <b><%= @schedule.person_name %></b> born on <b><%= @schedule.date_of_birth %></b>
+  <b><%= @schedule.template %></b> 0&ndash;6 year immunization schedule for <b><%= @schedule.person_name %></b> born on <b><%= @schedule.date_of_birth %></b>
 </p>
 <p>
   <table>
-    <tr>
-      <th>Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
+    <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+      <th class="table_header">Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
       <% @schedule.dose_months.each do |month| %>
-        <th><%= month %>&nbsp;M</th>
+        <th class="table_header"><%= month %>&nbsp;M</th>
       <% end %>
     </tr>
     <% @schedule.vaccines.each do |vaccine| %>
-    <tr>
-      <td><b><%= vaccine.name %></b></td>
-      <% @schedule.dose_months.each do |month| %>
-        <%= dose_info(vaccine, month) %>
-      <% end %>
-    </tr>
+      <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+        <th rowspan="3", class="table_header"><%= vaccine.name %></th>
+        <% @schedule.dose_months.each do |month| %>
+          <% flag= false; vaccine.doses.each do |dose| %>
+            <% if dose.months_scheduled_from_date_of_birth == month %>
+              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_short_name"><%= vaccine.short_name %></td>
+              <% flag= true; break %>
+            <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
+              <% flag= true; break %>
+            <% end %>
+          <% end %>
+          <% unless flag %>
+            <td>&nbsp;</td>
+          <% end %>
+        <% end %>
+      </tr>
+      <tr class="<%= current_cycle %>">
+        <% @schedule.dose_months.each do |month| %>
+          <% flag= false; vaccine.doses.each do |dose| %>
+            <% if dose.months_scheduled_from_date_of_birth == month %>
+              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_due">due:&nbsp;<%= ((dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth)).to_s + (dose.administration_window_in_months > 0 ? "&ndash;" + (dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1)).to_s  : "" )).html_safe %></td>
+              <% flag= true; break %>
+            <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
+              <% flag= true; break %>
+            <% end %>
+          <% end %>
+          <% unless flag %>
+            <td>&nbsp;</td>
+          <% end %>
+        <% end %>
+      </tr>
+      <tr class="<%= current_cycle %>">
+        <% @schedule.dose_months.each do |month| %>
+          <% flag= false; vaccine.doses.each do |dose| %>
+            <% if dose.months_scheduled_from_date_of_birth == month %>
+              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_given">given:&nbsp;<%= dose.date_administered %></td>
+              <% flag= true; break %>
+            <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
+              <% flag= true; break %>
+            <% end %>
+          <% end %>
+          <% unless flag %>
+            <td>&nbsp;</td>
+          <% end %>
+        <% end %>
+      </tr>
     <% end %>
-    <tr>
-      <td>Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>"><%= @schedule.notes %></td>
+    <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+      <td class="table_header">Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>", class="notes"><%= @schedule.notes %></td>
     </tr>
   </table>
 </p>
 
 <%= link_to 'Edit', edit_schedule_path(@schedule) %> |
 <%= link_to 'Back', schedules_path %>
+
+<p>
+  <%= form_for(@schedule.vaccines[0].doses[0]) do |f| %>
+    <div class="field">
+      <%= f.label :date_administered, "Date administered" %><br />
+      <%= f.date_select :date_administered %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</p>
