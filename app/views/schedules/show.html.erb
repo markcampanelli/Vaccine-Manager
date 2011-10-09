@@ -1,30 +1,30 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b><%= @schedule.template %></b> 0&ndash;6 year immunization schedule for <b><%= @schedule.person_name %></b> born on <b><%= @schedule.date_of_birth %></b>
+  <b><%= @schedule.template %></b> 0&ndash;6 year immunization schedule for <b><%= @schedule.person_name %></b> born on <b><%= l @schedule.date_of_birth %></b>
 </p>
 <p>
   <table>
     <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
-      <th class="table_header">Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
+      <th class="table_corner_header_left_cell">Vaccine &darr;</th><th class="table_corner_header_right_cell">Age &rarr;</th>
       <% @schedule.dose_months.each do |month| %>
-        <th class="table_header"><%= month %>&nbsp;M</th>
+        <th class="table_top_header"><%= month < 24 ? month.to_s + " M" : month.divmod(12).first.to_s + " Y, " + month.divmod(12).last.to_s + " M" %></th>
       <% end %>
     </tr>
     <% @schedule.vaccines.each do |vaccine| %>
       <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
-        <th rowspan="3", class="table_header"><%= vaccine.name %></th>
+        <th rowspan="3", colspan="2", class="table_side_header"><%= vaccine.name %></th>
         <% @schedule.dose_months.each do |month| %>
           <% flag= false; vaccine.doses.each do |dose| %>
             <% if dose.months_scheduled_from_date_of_birth == month %>
-              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_short_name"><%= vaccine.short_name %></td>
+              <th colspan="<%= dose_colspan(dose, month) %>", class="dose_short_name"><%= vaccine.short_name %></th>
               <% flag= true; break %>
             <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
               <% flag= true; break %>
             <% end %>
           <% end %>
           <% unless flag %>
-            <td>&nbsp;</td>
+            <td class="dose_short_name">&nbsp;</td>
           <% end %>
         <% end %>
       </tr>
@@ -32,14 +32,14 @@
         <% @schedule.dose_months.each do |month| %>
           <% flag= false; vaccine.doses.each do |dose| %>
             <% if dose.months_scheduled_from_date_of_birth == month %>
-              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_due">due:&nbsp;<%= ((dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth)).to_s + (dose.administration_window_in_months > 0 ? "&ndash;" + (dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1)).to_s  : "" )).html_safe %></td>
+              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_due">due: <%= (l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth), format: :dose) + "&ndash;" + l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1), format: :dose)).html_safe %></td>
               <% flag= true; break %>
             <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
               <% flag= true; break %>
             <% end %>
           <% end %>
           <% unless flag %>
-            <td>&nbsp;</td>
+            <td class="dose_due">&nbsp;</td>
           <% end %>
         <% end %>
       </tr>
@@ -47,20 +47,20 @@
         <% @schedule.dose_months.each do |month| %>
           <% flag= false; vaccine.doses.each do |dose| %>
             <% if dose.months_scheduled_from_date_of_birth == month %>
-              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_given">given:&nbsp;<%= dose.date_administered %></td>
+              <td colspan="<%= dose_colspan(dose, month) %>", class="dose_given">given: <%= l(dose.date_administered, format: :dose) unless dose.date_administered.nil? %></td>
               <% flag= true; break %>
             <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
               <% flag= true; break %>
             <% end %>
           <% end %>
           <% unless flag %>
-            <td>&nbsp;</td>
+            <td class="dose_given">&nbsp;</td>
           <% end %>
         <% end %>
       </tr>
     <% end %>
     <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
-      <td class="table_header">Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>", class="notes"><%= @schedule.notes %></td>
+      <td colspan="2", class="notes">Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>", class="notes"><%= @schedule.notes %></td>
     </tr>
   </table>
 </p>

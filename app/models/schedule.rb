@@ -61,24 +61,24 @@ class Schedule < ActiveRecord::Base
 { months_scheduled_from_date_of_birth: 4, administration_window_in_months: 1 }, 
 { months_scheduled_from_date_of_birth: 6, administration_window_in_months: 13 },
 { months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] },
-{position: 7, name: 'Trivalent inactivated influenza vaccine', short_name: 'TIV', doses_attributes: [
-{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 12 },
-{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 12 } ] }, 
-{position: 8, name: 'Live, attenuated influenza vaccine', short_name: 'LAIV', doses_attributes: [
-{ months_scheduled_from_date_of_birth: 30, administration_window_in_months: 12 }, 
-{ months_scheduled_from_date_of_birth: 42, administration_window_in_months: 12 },
-{ months_scheduled_from_date_of_birth: 54, administration_window_in_months: 12 },
-{ months_scheduled_from_date_of_birth: 66, administration_window_in_months: 12 },
-{ months_scheduled_from_date_of_birth: 78, administration_window_in_months: 12 } ] },
-{position: 9, name: 'Measles, Mumps, & Rubella', short_name: 'MMR', doses_attributes: [
+#{position: 7, name: 'Trivalent inactivated influenza vaccine', short_name: 'TIV', doses_attributes: [
+#{ months_scheduled_from_date_of_birth: 6, administration_window_in_months: 12 },
+#{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 12 } ] }, 
+#{position: 8, name: 'Live, attenuated influenza vaccine', short_name: 'LAIV', doses_attributes: [
+#{ months_scheduled_from_date_of_birth: 30, administration_window_in_months: 12 }, 
+#{ months_scheduled_from_date_of_birth: 42, administration_window_in_months: 12 },
+#{ months_scheduled_from_date_of_birth: 54, administration_window_in_months: 12 },
+#{ months_scheduled_from_date_of_birth: 66, administration_window_in_months: 12 },
+#{ months_scheduled_from_date_of_birth: 78, administration_window_in_months: 12 } ] },
+{position: 7, name: 'Measles, Mumps, & Rubella', short_name: 'MMR', doses_attributes: [
 { months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 }, 
 { months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] }, 
-{position: 10, name: 'Varicella', short_name: 'Varicella', doses_attributes: [
+{position: 8, name: 'Varicella', short_name: 'Varicella', doses_attributes: [
 { months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 }, 
 { months_scheduled_from_date_of_birth: 4*12, administration_window_in_months: 3*12 } ] }, 
-{position: 11, name: 'Hepatitis A', short_name: 'HepA', doses_attributes: [
-{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 6 },
-{ months_scheduled_from_date_of_birth: 18, administration_window_in_months: 6 } ] } ]
+{position: 9, name: 'Hepatitis A', short_name: 'HepA', doses_attributes: [
+{ months_scheduled_from_date_of_birth: 12, administration_window_in_months: 4 },
+{ months_scheduled_from_date_of_birth: 23, administration_window_in_months: 1 } ] } ]
         
       when Templates[1] # Custom
         return []
