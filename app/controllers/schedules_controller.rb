@@ -1,6 +1,6 @@
 class SchedulesController < ApplicationController
     
-  before_filter :load_date_of_birth, only: [ :create, :update ]
+  before_filter :load_date_of_birth_year, only: [ :create, :update ]
   
   # GET /schedules
   # GET /schedules.json
@@ -29,7 +29,7 @@ class SchedulesController < ApplicationController
   # GET /schedules/new
   # GET /schedules/new.json
   def new
-    @schedule= Schedule.new(date_of_birth: Date.today)
+    @schedule= Schedule.new({ date_of_birth: Date.today, date_of_birth_year: Date.today.year })
     @subtitle= ": Entering New Schedule"
 
     respond_to do |format|
@@ -48,7 +48,7 @@ class SchedulesController < ApplicationController
   # POST /schedules.json
   def create
     @schedule= Schedule.new(params[:schedule])
-    @schedule.vaccines.build(@schedule.template_vaccines)
+    @schedule.vaccines.build(@schedule.template_vaccines)      
        
     respond_to do |format|
       if @schedule.save
@@ -91,13 +91,8 @@ class SchedulesController < ApplicationController
   
   protected
     
-  def load_date_of_birth
-    # WIP: Add date_of_birth validation
-     unless params[:date_of_birth][:year].blank?
-       params[:schedule]["date_of_birth(1i)"]= params[:date_of_birth][:year]
-       params[:schedule]["date_of_birth(2i)"]= params[:date_of_birth][:month]
-       params[:schedule]["date_of_birth(3i)"]= params[:date_of_birth][:day]
-     end
+  def load_date_of_birth_year
+    params[:schedule]["date_of_birth(1i)"]= params[:schedule][:date_of_birth_year]
   end
   
 end

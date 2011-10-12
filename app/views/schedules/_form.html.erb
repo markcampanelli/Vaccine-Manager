@@ -11,50 +11,73 @@
     </div>
   <% end %>
   <div class="field">
-    <%= schedule_form.select(:template, options_for_select(Schedule::Templates, selected: Schedule::Templates[0], 
-disabled: Schedule::Templates[1..Schedule::Templates.length-1] )) %> 0&ndash;6 year immunization schedule for 
-<%= schedule_form.text_field :person_name, size: 40, placeholder: "Enter person name"  %> born on 
-<%= select_day @schedule.date_of_birth.nil? ? Date.today.day : @schedule.date_of_birth.day, :prefix => :date_of_birth %><%= select_month @schedule.date_of_birth.nil? ? Date.today.month : @schedule.date_of_birth.month, :prefix => :date_of_birth %><%= text_field_tag "date_of_birth[year]", @schedule.date_of_birth.nil? ? Date.today.year : @schedule.date_of_birth.year, placeholder: "Year (YYYY)", size: 10 %>
+    <%= schedule_form.select(:template, options_for_select(Schedule::Templates, selected: Schedule::Templates[0], disabled: Schedule::Templates[1..Schedule::Templates.length-1] )) %> 0&ndash;6 year immunization schedule for <%= schedule_form.text_field :person_name, size: 40, placeholder: "Enter person name"  %> born on <%= schedule_form.date_select :date_of_birth, order: [:day, :month] %><%= schedule_form.text_field :date_of_birth_year, size: 10, placeholder: "Year (YYYY)" %>
   </div>
-  <table>
-    <% unless @schedule.new_record? %>
-      <tr>
-        <th>Vaccine&darr;&nbsp;&nbsp;&nbsp;&nbsp;Age&rarr;</th>
-        <% @schedule.dose_months.each do |month| %>
-          <th><%= month %>&nbsp;M</th>
-        <% end %>
-      </tr>
-      <% @schedule.vaccines.each do |vaccine| %>
-        <tr>
-          <th><%= vaccine.name %></th>
+  <div class="field">
+    <table>
+      <% unless @schedule.new_record? %>
+        <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+          <th class="table_corner_header_left_cell">Vaccine &darr;</th><th class="table_corner_header_right_cell">Age &rarr;</th>
           <% @schedule.dose_months.each do |month| %>
-            <%= schedule_form.fields_for :vaccines, vaccine do |vaccine_fields| %>
-              <% flag= false; vaccine.doses.each do |dose| %>
+            <th class="table_top_header"><%= month < 24 ? month.to_s + " M" : month.divmod(12).first.to_s + " Y, " + month.divmod(12).last.to_s + " M" %></th>
+          <% end %>
+        </tr>
+        <%= schedule_form.fields_for :vaccines do |vaccine_fields| %>
+          <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+            <th rowspan="3", colspan="2", class="table_side_header"><%= vaccine_fields.object.name %></th>
+            <% @schedule.dose_months.each do |month| %>
+              <% flag= false; vaccine_fields.object.doses.each do |dose| %>
                 <% if dose.months_scheduled_from_date_of_birth == month %>
-                  <td colspan="<%= dose_colspan(dose, month) %>", style="white-space: nowrap">
-                    <%= vaccine.short_name %><br />
-                    due:&nbsp;<%= (l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth), format: :dose) + "&ndash;" + l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1), format: :dose)).html_safe %><br />
-                    given:&nbsp;<%= vaccine_fields.fields_for :doses, dose do |dose_fields| %><%= dose_fields.date_select :date_administered, use_short_month: true, start_year: @schedule.date_of_birth.year, end_year: @schedule.date_of_birth.year + 8, order: [ :day, :month, :year ], prompt: { day: '-d-', month: '-m-', year: '-y-' } %>
-                    <% end %>
-                  </td>
+                  <th colspan="<%= dose_colspan(dose, month) %>", class="dose_short_name"><%= vaccine_fields.object.short_name %></th>
                   <% flag= true; break %>
-                <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + 
-      dose.administration_window_in_months) %>
+                <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
                   <% flag= true; break %>
                 <% end %>
               <% end %>
               <% unless flag %>
-                <td>&nbsp;</td>
+                <td class="dose_short_name">&nbsp;</td>
               <% end %>
             <% end %>
-          <% end %>
-        </tr>
+          </tr>
+          <tr class="<%= current_cycle %>">
+            <% @schedule.dose_months.each do |month| %>
+              <% flag= false; vaccine_fields.object.doses.each do |dose| %>
+                <% if dose.months_scheduled_from_date_of_birth == month %>
+                  <td colspan="<%= dose_colspan(dose, month) %>", class="dose_due">due: <%= (l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth), format: :dose) + "&ndash;" + l(dose.vaccine.schedule.date_of_birth.advance(months: dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months, days: -1), format: :dose)).html_safe %></td>
+                  <% flag= true; break %>
+                <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
+                  <% flag= true; break %>
+                <% end %>
+              <% end %>
+              <% unless flag %>
+                <td class="dose_due">&nbsp;</td>
+              <% end %>
+            <% end %>
+          </tr>
+          <tr class="<%= current_cycle %>">
+            <% @schedule.dose_months.each do |month| %>
+              <% flag= false; vaccine_fields.object.doses.each do |dose| # TBD: Why doesn't "vaccine_fields.fields_for :doses do |dose_fields| " work directly? %>
+                <% if dose.months_scheduled_from_date_of_birth == month %>
+                  <%= vaccine_fields.fields_for :doses, dose do |dose_fields| %>
+                    <td colspan="<%= dose_colspan(dose, month) %>", class="dose_given">given: <%= dose_fields.date_select :date_administered, use_short_month: true, start_year: @schedule.date_of_birth.year, end_year: @schedule.date_of_birth.year + 8, order: [ :day, :month, :year ], prompt: { day: '-d-', month: '-m-', year: '-y-' } %></td>
+                  <% end %>
+                  <% flag= true; break %>
+                <% elsif (dose.months_scheduled_from_date_of_birth < month) && (month < dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months) %>
+                  <% flag= true; break %>
+                <% end %>
+              <% end %>
+              <% unless flag %>
+                <td class="dose_given">&nbsp;</td>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
       <% end %>
-    <% end %>
-    <tr>
-      <td>Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>"><%= schedule_form.text_area :notes, cols: 120, rows: 5, placeholder: "Enter optional notes" %></td>
-    </tr>
-  </table>
+      <tr class="<%= cycle('list_line_odd', 'list_line_even') %>">
+        <td colspan="2", class="notes">Notes</td><td colspan="<%= @schedule.dose_months.length.to_s %>"><%= schedule_form.text_area :notes, cols: 120, rows: 3, placeholder: "Enter optional notes" %></td>
+      </tr>
+    </table>
+  </div>
   <div class="actions">
     <%= schedule_form.submit %>
   </div>

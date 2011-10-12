@@ -4,14 +4,23 @@ class Schedule < ActiveRecord::Base
   
   has_many :vaccines, dependent: :destroy, order: :position
   has_many :doses, through: :vaccines
-  accepts_nested_attributes_for :vaccines
+  accepts_nested_attributes_for :vaccines, allow_destroy: true
  
-  attr_accessible :person_name, :date_of_birth, :template, :notes, :vaccines_attributes
+  attr_accessible :person_name, :date_of_birth, :date_of_birth_year, :template, :notes, :vaccines_attributes
   
   validates :person_name, presence: true, uniqueness: true
   validates :date_of_birth, presence: true
+  validates :date_of_birth_year, presence: true, numericality: { only_integer: true }
   validates :template, presence: true, inclusion: { in: Templates }
   validates_associated :vaccines
+  
+  def date_of_birth_year
+    @date_of_birth_year ||= self.date_of_birth.year
+  end
+
+  def date_of_birth_year=(year)
+    @date_of_birth_year= year
+  end
   
   def dose_months
     dose_months= SortedSet.new()
@@ -19,15 +28,12 @@ class Schedule < ActiveRecord::Base
     self.doses.each do |dose|
       dose_months << dose.months_scheduled_from_date_of_birth
       dose_months << (dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months - 1)
-      if (dose.months_scheduled_from_date_of_birth + dose.administration_window_in_months - 1) == 17
-        puts dose.vaccine.name
-      end
     end
     
     return dose_months
   end
   
- # WIP: Should be protected or folded into overridden new method?
+ # TBD: Should be protected or folded into overridden new method?
   def template_vaccines
     case self.template
       when Templates[0] # U.S. CDC 2011
