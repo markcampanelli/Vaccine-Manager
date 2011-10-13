@@ -1,3 +1,3 @@
-# Vaccine Manager
+# Vaccine Manager README
 
-A web applicatoin to plan vaccine schedules and to record the actual implementations.
+Vaccine Manager is a web application being developed to plan vaccination schedules and to record dose administration. This is for demonstration purposes only, and currently there is no privacy or permanency of the data entered into this application.

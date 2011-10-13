@@ -1,6 +1,7 @@
 VaccineManager::Application.routes.draw do
   resources :schedules
-  resources :doses
+  
+  root :to => 'schedules#index'
   
   get "manager/timetable"
 

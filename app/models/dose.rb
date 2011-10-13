@@ -10,13 +10,14 @@ class Dose < ActiveRecord::Base
   
   def date_administered_is_valid
     unless date_administered.nil?
-      errors.add(:date_administered, "can't occur before date of birth (" + self.vaccine.short_name.to_s + ")") if date_administered < self.vaccine.schedule.date_of_birth
+      errors.add(:date_administered, "can't occur before date of birth (" + self.vaccine.short_name.to_s + ")") if 
+date_administered < self.vaccine.schedule.date_of_birth
       
-      administered_doses_before= self.vaccine.doses.select { |dose| !dose.date_administered.nil? && 
-dose.months_scheduled_from_date_of_birth < self.months_scheduled_from_date_of_birth }
-      errors.add(:date_administered, "can't be before a previous administered dose's administration date (" + 
-self.vaccine.short_name.to_s + ")") unless 
-(administered_doses_before.select { |dose_before| dose_before.date_administered > self.date_administered }).empty?
+#      administered_doses_before= self.vaccine.doses.select { |dose| !dose.date_administered.nil? && 
+#dose.months_scheduled_from_date_of_birth < self.months_scheduled_from_date_of_birth }
+#      errors.add(:date_administered, "can't be before a previous administered dose's administration date (" + 
+#self.vaccine.short_name.to_s + ")") unless 
+#(administered_doses_before.select { |dose_before| dose_before.date_administered > self.date_administered }).empty?
     end
   end
   

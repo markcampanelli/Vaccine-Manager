@@ -1,4 +1,4 @@
-<h1>Listing schedules</h1>
+<h2>Vaccine Manager is a web application being developed to plan vaccination schedules and to record dose administration. This is for demonstration purposes only, and currently there is no privacy or permanency of the data entered into this application.</h2>
 
 <table>
   <tr>
@@ -6,9 +6,7 @@
     <th>Birthday</th>
     <th>Template</th>
     <th>Notes</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th colspan="3">Action</th>
   </tr>
 
 <% @schedules.each do |schedule| %>
@@ -16,7 +14,7 @@
     <td><%= schedule.person_name %></td>
     <td><%= schedule.date_of_birth %></td>
     <td><%= schedule.template %></td>
-    <td><%= schedule.notes %></td>
+    <td><%= truncate(schedule.notes, length: 80) %></td>
     <td><%= link_to 'Show', schedule %></td>
     <td><%= link_to 'Edit', edit_schedule_path(schedule) %></td>
     <td><%= link_to 'Destroy', schedule, confirm: 'Are you sure?', method: :delete %></td>
